@@ -185,6 +185,24 @@ body.paper::after{display:none}
 body.paper .row2 button{font-family:'Caveat','Segoe Script',cursive;font-size:22px;font-weight:700;text-transform:none;letter-spacing:0;background:#e6cf9a;color:#3a2210;border:2px solid #7a5026;border-radius:8px;box-shadow:0 3px 0 #5b3a18}
 body.paper .row2 button.alt{background:#d7bd84}
 @media (prefers-reduced-motion:reduce){.ink{animation:none;opacity:.94}}
+
+/* regalo para el Mac */
+.giftwrap{width:100%;max-width:480px;margin:18px auto 0;display:none;flex-direction:column;align-items:center;gap:12px}
+.giftwrap.show{display:flex;animation:inkin 1s ease both}
+.gift{background:none;border:0;padding:0;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;font-family:'Caveat','Segoe Script',cursive;font-size:26px;font-weight:700;color:#f3e2b8;text-shadow:0 2px 6px rgba(0,0,0,.6)}
+.gift svg{width:96px;height:96px;overflow:visible;animation:hop 1.8s ease-in-out infinite;filter:drop-shadow(0 6px 8px rgba(0,0,0,.5))}
+.gift .lid{transition:transform .5s cubic-bezier(.3,1.5,.5,1);transform-origin:60px 49px}
+.gift.open .lid{transform:translateY(-22px) rotate(-8deg)}
+.gift.open svg{animation:none}
+.gift:focus-visible{outline:3px solid #e8c35a;outline-offset:4px;border-radius:8px}
+@keyframes hop{0%,100%{transform:translateY(0)}45%{transform:translateY(-7px)}}
+.giftcard{width:100%;padding:18px 20px 20px;border-radius:10px;background:linear-gradient(170deg,#ecd7a4,#d9be84);color:#3a2210;font-family:'Caveat','Segoe Script',cursive;box-shadow:0 10px 18px rgba(0,0,0,.5);font-size:23px;line-height:1.15}
+.giftcard:not([hidden]){animation:inkin .7s ease both}
+.giftcard h3{margin:0 0 6px;font-size:30px;text-align:center}
+.giftcard p{margin:0 0 8px}.giftcard p.small{font-size:19px;opacity:.85}
+.giftcard ol{margin:0 0 10px;padding-left:24px}.giftcard li{margin-bottom:6px}
+.giftcard .dl{display:block;text-align:center;text-decoration:none;font-weight:700;font-size:26px;padding:8px 14px;border-radius:8px;background:#7d3374;color:#fbeed6;box-shadow:0 3px 0 #4b1a45}
+@media (prefers-reduced-motion:reduce){.gift svg{animation:none}}
 </style>
 </head>
 <body>
@@ -570,8 +588,20 @@ function secretScreen(){
     q.style.animationDelay=(0.6+i*2.3)+"s";txt.appendChild(q);
   });
   pap.appendChild(txt);
-  pap.addEventListener("click",function(){pap.classList.add("skip")});
   w.appendChild(pap);
+  var gift=el("div","giftwrap");
+  gift.innerHTML='<button class="gift" type="button" aria-expanded="false"><svg viewBox="0 0 120 120" aria-hidden="true"><g class="lid"><rect x="12" y="38" width="96" height="22" rx="3" fill="#5f2458"/><rect x="54" y="38" width="12" height="22" fill="#e8c35a"/><path d="M60 38C38 6 16 24 40 38Z" fill="#e8c35a"/><path d="M60 38C82 6 104 24 80 38Z" fill="#d9ae45"/><circle cx="60" cy="38" r="6" fill="#c9a23f"/></g><rect x="20" y="60" width="80" height="52" rx="3" fill="#7d3374"/><rect x="54" y="60" width="12" height="52" fill="#e8c35a"/></svg><span>Regalo para tu Mac</span></button>'+
+   '<div class="giftcard" hidden><h3>Regalo para tu Mac</h3><p>Un fondo de pantalla que cambia solo durante el día.</p><ol><li>Descarga el archivo y ábrelo.</li><li>Haz clic derecho en <b>Instalar fondo dinamico.command</b>, elige <b>Abrir</b> y otra vez <b>Abrir</b>.</li><li>Listo. Se pone solo según la hora: 9:00 Sunset, 12:00 Día y 18:00 Noche.</li></ol><p class="small">Es normal que el Mac avise que el archivo no viene de la App Store.</p><a class="dl" href="regalo/FondoDinamico.zip" download>Descargar fondo dinámico</a></div>';
+  var gb=gift.querySelector(".gift"),gc=gift.querySelector(".giftcard"),shown=false;
+  function showGift(){if(shown)return;shown=true;gift.classList.add("show")}
+  txt.lastChild.addEventListener("animationend",showGift);
+  setTimeout(showGift,(0.6+(LETTER.length-1)*2.3+2.4)*1000);
+  pap.addEventListener("click",function(){pap.classList.add("skip");showGift()});
+  gb.addEventListener("click",function(){
+    var open=gc.hidden;gc.hidden=!open;gb.classList.toggle("open",open);gb.setAttribute("aria-expanded",open?"true":"false");
+    if(open){sfx("win");setTimeout(function(){gc.scrollIntoView({behavior:"smooth",block:"nearest"})},50)}
+  });
+  w.appendChild(gift);
   var row=el("div","row2");
   var back=el("button","",'Volver a la selección');
   back.addEventListener("click",function(){sfx("ok");levelSelect();window.scrollTo(0,0)});
