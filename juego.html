@@ -189,8 +189,10 @@ body.paper .row2 button.alt{background:#d7bd84}
 /* regalo para el Mac */
 .giftwrap{width:100%;max-width:480px;margin:18px auto 0;display:none;flex-direction:column;align-items:center;gap:12px}
 .giftwrap.show{display:flex;animation:inkin 1s ease both}
-.gift{background:none;border:0;padding:0;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;font-family:'Caveat','Segoe Script',cursive;font-size:26px;font-weight:700;color:#f3e2b8;text-shadow:0 2px 6px rgba(0,0,0,.6)}
-.gift svg{width:96px;height:96px;overflow:visible;animation:hop 1.8s ease-in-out infinite;filter:drop-shadow(0 6px 8px rgba(0,0,0,.5))}
+.gift{background:none;border:0;padding:0;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;font-family:'Caveat','Segoe Script',cursive;font-size:21px;line-height:1;font-weight:700;color:#f3e2b8;text-shadow:0 2px 6px rgba(0,0,0,.6);flex:1 1 0;min-width:0}
+.gifts{display:flex;justify-content:center;gap:6px;width:100%}
+.cardslot{width:100%}
+.gift svg{width:76px;height:76px;overflow:visible;animation:hop 1.8s ease-in-out infinite;filter:drop-shadow(0 6px 8px rgba(0,0,0,.5))}
 .gift .lid{transition:transform .5s cubic-bezier(.3,1.5,.5,1);transform-origin:60px 49px}
 .gift.open .lid{transform:translateY(-22px) rotate(-8deg)}
 .gift.open svg{animation:none}
@@ -201,6 +203,8 @@ body.paper .row2 button.alt{background:#d7bd84}
 .giftcard h3{margin:0 0 6px;font-size:30px;text-align:center}
 .giftcard p{margin:0 0 8px}.giftcard p.small{font-size:19px;opacity:.85}
 .giftcard ol{margin:0 0 10px;padding-left:24px}.giftcard li{margin-bottom:6px}
+.giftcard .dl+.dl{margin-top:8px}
+.thumbs{display:flex;justify-content:center;gap:12px;margin:0 0 12px}.thumbs figure{margin:0;text-align:center;font-size:20px}.thumbs img{display:block;height:170px;width:auto;border-radius:6px;box-shadow:0 4px 8px rgba(0,0,0,.4)}.thumbs.one img{height:200px}
 .giftcard .dl{display:block;text-align:center;text-decoration:none;font-weight:700;font-size:26px;padding:8px 14px;border-radius:8px;background:#7d3374;color:#fbeed6;box-shadow:0 3px 0 #4b1a45}
 @media (prefers-reduced-motion:reduce){.gift svg{animation:none}}
 </style>
@@ -590,17 +594,31 @@ function secretScreen(){
   pap.appendChild(txt);
   w.appendChild(pap);
   var gift=el("div","giftwrap");
-  gift.innerHTML='<button class="gift" type="button" aria-expanded="false"><svg viewBox="0 0 120 120" aria-hidden="true"><g class="lid"><rect x="12" y="38" width="96" height="22" rx="3" fill="#5f2458"/><rect x="54" y="38" width="12" height="22" fill="#e8c35a"/><path d="M60 38C38 6 16 24 40 38Z" fill="#e8c35a"/><path d="M60 38C82 6 104 24 80 38Z" fill="#d9ae45"/><circle cx="60" cy="38" r="6" fill="#c9a23f"/></g><rect x="20" y="60" width="80" height="52" rx="3" fill="#7d3374"/><rect x="54" y="60" width="12" height="52" fill="#e8c35a"/></svg><span>Regalo para tu Mac</span></button>'+
-   '<div class="giftcard" hidden><h3>Regalo para tu Mac</h3><p>Un fondo de pantalla que cambia solo durante el día.</p><ol><li>Descarga el archivo y ábrelo.</li><li>Haz clic derecho en <b>Instalar fondo dinamico.command</b>, elige <b>Abrir</b> y otra vez <b>Abrir</b>.</li><li>Listo. Se pone solo según la hora: 9:00 Sunset, 12:00 Día y 18:00 Noche.</li></ol><p class="small">Es normal que el Mac avise que el archivo no viene de la App Store.</p><a class="dl" href="regalo/FondoDinamico.zip" download>Descargar fondo dinámico</a></div>';
-  var gb=gift.querySelector(".gift"),gc=gift.querySelector(".giftcard"),shown=false;
+  function box(c1,c2,c3){return '<svg viewBox="0 0 120 120" aria-hidden="true"><g class="lid"><rect x="12" y="38" width="96" height="22" rx="3" fill="'+c1+'"/><rect x="54" y="38" width="12" height="22" fill="'+c3+'"/><path d="M60 38C38 6 16 24 40 38Z" fill="'+c3+'"/><path d="M60 38C82 6 104 24 80 38Z" fill="'+c3+'" opacity=".85"/><circle cx="60" cy="38" r="6" fill="'+c3+'"/></g><rect x="20" y="60" width="80" height="52" rx="3" fill="'+c2+'"/><rect x="54" y="60" width="12" height="52" fill="'+c3+'"/></svg>'}
+  var GIFTS=[
+   {t:"Para tu Mac",c:["#5f2458","#7d3374","#e8c35a"],h:'<h3>Regalo para tu Mac</h3><p>Un fondo de pantalla que cambia solo durante el día.</p><ol><li>Descarga el archivo y ábrelo.</li><li>Haz clic derecho en <b>Instalar fondo dinamico.command</b>, elige <b>Abrir</b> y otra vez <b>Abrir</b>.</li><li>Listo. Se pone solo según la hora: 9:00 Sunset, 12:00 Día y 18:00 Noche.</li></ol><p class="small">Es normal que el Mac avise que el archivo no viene de la App Store.</p><a class="dl" href="regalo/FondoDinamico.zip" download>Descargar fondo dinámico</a>'},
+   {t:"Para tu celular",c:["#1d5a6e","#27768f","#f0c75e"],h:'<h3>Regalo para tu celular</h3><p>Dos fondos de pantalla: uno de noche y uno de día.</p><div class="thumbs"><figure><img src="regalo/th-noche.webp" alt="Fondo de noche"><figcaption>Noche</figcaption></figure><figure><img src="regalo/th-dia.webp" alt="Fondo de día"><figcaption>Día</figcaption></figure></div><a class="dl" href="regalo/fondo-celular-noche.jpg" download="Natalia_32_Fondo_Noche.jpg">Descargar fondo de noche</a><a class="dl" href="regalo/fondo-celular-dia.jpg" download="Natalia_32_Fondo_Dia.jpg">Descargar fondo de día</a><p class="small">Si la imagen se abre en pantalla, mantén presionado sobre ella y elige Guardar imagen.</p>'},
+   {t:"Tu póster",c:["#a8325e","#c4457a","#f6d36b"],h:'<h3>Tu póster de cumpleaños</h3><p>Para guardarlo, compartirlo o imprimirlo.</p><div class="thumbs one"><figure><img src="regalo/th-poster.webp" alt="Póster Cumpleaños 32 Natalia"></figure></div><a class="dl" href="regalo/poster-cumpleanos-32.jpg" download="Poster_Cumpleanos_32_Natalia.jpg">Descargar póster</a><p class="small">Si la imagen se abre en pantalla, mantén presionado sobre ella y elige Guardar imagen.</p>'}
+  ];
+  var row3=el("div","gifts"),cards=el("div","cardslot");
+  var btns=[],panels=[];
+  GIFTS.forEach(function(g,i){
+    var b=document.createElement("button");b.type="button";b.className="gift";b.setAttribute("aria-expanded","false");
+    b.innerHTML=box(g.c[0],g.c[1],g.c[2])+"<span>"+g.t+"</span>";
+    var c=document.createElement("div");c.className="giftcard";c.hidden=true;c.innerHTML=g.h;
+    b.addEventListener("click",function(){
+      var open=c.hidden;
+      btns.forEach(function(x,j){x.classList.remove("open");x.setAttribute("aria-expanded","false");panels[j].hidden=true});
+      if(open){c.hidden=false;b.classList.add("open");b.setAttribute("aria-expanded","true");sfx("win");setTimeout(function(){c.scrollIntoView({behavior:"smooth",block:"nearest"})},50)}
+    });
+    btns.push(b);panels.push(c);row3.appendChild(b);cards.appendChild(c);
+  });
+  gift.append(row3,cards);
+  var shown=false;
   function showGift(){if(shown)return;shown=true;gift.classList.add("show")}
   txt.lastChild.addEventListener("animationend",showGift);
   setTimeout(showGift,(0.6+(LETTER.length-1)*2.3+2.4)*1000);
   pap.addEventListener("click",function(){pap.classList.add("skip");showGift()});
-  gb.addEventListener("click",function(){
-    var open=gc.hidden;gc.hidden=!open;gb.classList.toggle("open",open);gb.setAttribute("aria-expanded",open?"true":"false");
-    if(open){sfx("win");setTimeout(function(){gc.scrollIntoView({behavior:"smooth",block:"nearest"})},50)}
-  });
   w.appendChild(gift);
   var row=el("div","row2");
   var back=el("button","",'Volver a la selección');
