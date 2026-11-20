@@ -601,6 +601,23 @@ function secretScreen(){
    {t:"Para tu Mac",c:["#5f2458","#7d3374","#e8c35a"],h:'<h3>Regalo para tu Mac</h3><p>Un fondo de pantalla que cambia solo durante el día.</p><ol><li>Descarga el archivo y ábrelo.</li><li>Haz clic derecho en <b>Instalar fondo dinamico.command</b>, elige <b>Abrir</b> y otra vez <b>Abrir</b>.</li><li>Listo. Se pone solo según la hora: 9:00 Sunset, 12:00 Día y 18:00 Noche.</li></ol><p class="small">Es normal que el Mac avise que el archivo no viene de la App Store.</p><a class="dl" href="regalo/FondoDinamico.zip" download>Descargar fondo dinámico</a>'},
    {t:"El cuento",c:["#7a4a14","#9a6320","#f3dc8c"],h:'<h3>El cuento en PDF</h3><p>Alas para soñar completo, para leerlo cuando quieras o guardarlo.</p><a class="dl" href="regalo/Alas_para_sonar.pdf" download="Alas_para_sonar.pdf">Descargar el cuento (PDF)</a><p class="small">Pesa unos 8 MB. Si se abre en pantalla, usa la opción Guardar o Compartir de tu navegador.</p>'}
   ];
+  var IOS=/iP(hone|ad|od)/.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
+  function saveBlob(b,name){var u=URL.createObjectURL(b),x=document.createElement("a");x.href=u;x.download=name;x.style.display="none";document.body.appendChild(x);x.click();setTimeout(function(){document.body.removeChild(x);URL.revokeObjectURL(u)},4000)}
+  function wireDl(a){
+    var url=a.getAttribute("href"),name=a.getAttribute("download")||url.split("/").pop(),pr=null;
+    function load(){if(!pr)pr=fetch(url).then(function(r){if(!r.ok)throw 0;return r.blob()});return pr}
+    a._pre=load;
+    a.addEventListener("click",function(e){
+      e.preventDefault();
+      load().then(function(b){
+        var f;try{f=new File([b],name,{type:b.type})}catch(x){f=null}
+        if(IOS&&f&&navigator.canShare&&navigator.canShare({files:[f]})){
+          return navigator.share({files:[f]}).catch(function(err){if(!(err&&err.name==="AbortError"))saveBlob(b,name)});
+        }
+        saveBlob(b,name);
+      }).catch(function(){window.location.href=url});
+    });
+  }
   var row3=el("div","gifts"),cards=el("div","cardslot");
   var btns=[],panels=[];
   GIFTS.forEach(function(g,i){
@@ -610,8 +627,9 @@ function secretScreen(){
     b.addEventListener("click",function(){
       var open=c.hidden;
       btns.forEach(function(x,j){x.classList.remove("open");x.setAttribute("aria-expanded","false");panels[j].hidden=true});
-      if(open){c.hidden=false;b.classList.add("open");b.setAttribute("aria-expanded","true");sfx("win");setTimeout(function(){c.scrollIntoView({behavior:"smooth",block:"nearest"})},50)}
+      if(open){[].forEach.call(c.querySelectorAll("a.dl"),function(a){a._pre&&a._pre().catch(function(){})});c.hidden=false;b.classList.add("open");b.setAttribute("aria-expanded","true");sfx("win");setTimeout(function(){c.scrollIntoView({behavior:"smooth",block:"nearest"})},50)}
     });
+    [].forEach.call(c.querySelectorAll("a.dl"),wireDl);
     btns.push(b);panels.push(c);row3.appendChild(b);cards.appendChild(c);
   });
   gift.append(row3,cards);
